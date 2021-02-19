@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+
+<project name="voldemort" basedir="." default="bail-out">
+
+  <target name="bail-out">
+    <echo message="Ant is not supported anymore. Please use Gradle instead:" />
+    <echo message="./gradlew tasks" />
+  </target>
+
+  <target name="all" depends="bail-out" />
+
+  <target name="clean" depends="bail-out" />
+
+  <target name="build" depends="bail-out" />
+
+  <target name="buildtest" depends="bail-out" />
+
+  <target name="test" depends="bail-out" />
+
+  <target name="jar" depends="bail-out" />
+
+  <target name="srcjar" depends="bail-out" />
+
+  <target name="alljar" depends="bail-out" />
+
+  <target name="war" depends="bail-out" />
+
+  <target name="contrib-build" depends="bail-out" />
+
+  <target name="contrib-jar" depends="bail-out" />
+
+  <target name="contrib-srcjar" depends="bail-out" />
+
+  <target name="contrib-junit" depends="bail-out" />
+
+  <target name="ec2testing-junit" depends="bail-out" />
+
+  <target name="ec2testing-gossip" depends="bail-out" />
+
+  <target name="ec2testing-rebalancing" depends="bail-out" />
+
+  <target name="snapshot" depends="bail-out" />
+
+  <target name="release" depends="bail-out" />
+
+  <target name="hadoop-benchmark-jar" depends="bail-out" />
+
+  <target name="junit" depends="bail-out" />
+
+  <target name="junit-long" depends="bail-out" />
+
+  <target name="junit-rebalance" depends="bail-out" />
+
+  <target name="junit-long-rebalance" depends="bail-out" />
+
+  <target name="junit-test" depends="bail-out" />
+
+  <target name="junit-all" depends="bail-out" />
+
+  <target name="docs" depends="bail-out" />
+
+  <target name="redeploy" depends="bail-out" />
+
+  <target name="list" depends="bail-out" />
+
+  <target name="deploy" depends="bail-out" />
+
+  <target name="undeploy" depends="bail-out" />
+
+</project>

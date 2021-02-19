@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package edu.msu.cse.cops.metadata;
+option java_multiple_files = true;
+
+message NodeVersion{
+	string node = 1; //"" if client
+	int64 version = 2;
+}
+
+message Dependency {
+	string key = 1;
+	repeated NodeVersion nodeVersion = 2;
+}
+
+message Record {
+	bytes value = 1;
+	repeated NodeVersion nodeVersion = 2;
+}
+
+
+//---------------Client messages---------------
+message GetMessage {
+	string key =1;
+}
+
+message PutMessage {
+	string key = 1;
+	bytes value = 2;
+	repeated Dependency nearest = 3;
+}
+
+
+message ClientMessage {
+	oneof message_type {
+		GetMessage get_message = 1;
+		PutMessage put_message = 2;
+	}
+}
+//-----------------------------------------------
+
+//-----------------Client Reply------------------
+message GetReply{
+	Record record = 1;
+}
+
+message PutReply{
+	repeated NodeVersion version = 1;
+}
+message ClientReply {
+	bool status = 1;
+	oneof message_type{
+		GetReply get_reply= 2;
+		PutReply put_reply= 3;
+	}
+}
+//-----------------------------------------------
+//-----------------Server messages---------------
+message ReplicateMessage {
+	string key = 1;
+	Record rec = 2;
+	repeated Dependency nearest =3 ;
+}
+
+message DependencyCheckMessage {
+	string forKey = 1;  //checking dependency to finally make visible which key? It is an optimization over original COPS
+	Dependency dep = 2; //key-version pair
+	int32 p_id=3; //requester partition id
+}
+
+message DependencyResponseMessage {
+	string forKey=1;
+	Dependency dep = 2;
+
+}
+
+message ServerMessage {
+	oneof message_type{
+		ReplicateMessage replicate_message = 1;
+		DependencyCheckMessage dep_check_message = 2;
+		DependencyResponseMessage dep_response_message = 3;
+	}
+}
+//-----------------------------------------------

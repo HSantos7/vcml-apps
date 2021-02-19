@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cluster>
+    <name>cops_big</name>
+    <defaults/>
+    <servers>
+        <server id="0_0" ip="127.0.0.1">
+            <config>
+                <server_jar_file>cops-server.jar</server_jar_file>
+                <username>santos</username>
+                <password>9637452as</password>
+                <working_directory>/home/santos/Desktop/test/server0_0</working_directory>
+                <client_port>10000</client_port>
+                <server_port>10001</server_port>
+                <control_port>10002</control_port>
+                <protocol_properties>
+                    <property key="num_of_datacenters" value="3"/>
+                    <property key="num_of_partitions" value="3"/>
+                    <property key="dc_id" value="0"/>
+                    <property key="p_id" value="0"/>
+                </protocol_properties>
+            </config>
+        </server>
+        <server id="0_1" ip="127.0.0.1">
+            <config>
+                <server_jar_file>cops-server.jar</server_jar_file>
+                <username>santos</username>
+                <password>9637452as</password>
+                <working_directory>/home/santos/Desktop/test/server0_1</working_directory>
+                <client_port>10010</client_port>
+                <server_port>10011</server_port>
+                <control_port>10012</control_port>
+                <protocol_properties>
+                    <property key="num_of_datacenters" value="3"/>
+                    <property key="num_of_partitions" value="3"/>
+                    <property key="dc_id" value="0"/>
+                    <property key="p_id" value="1"/>
+                </protocol_properties>
+            </config>
+        </server>
+        <server id="1_0" ip="127.0.0.1">
+            <config>
+                <server_jar_file>cops-server.jar</server_jar_file>
+                <username>santos</username>
+                <password>9637452as</password>
+                <working_directory>/home/santos/Desktop/test/server1_0</working_directory>
+                <client_port>10100</client_port>
+                <server_port>10101</server_port>
+                <control_port>10102</control_port>
+                <protocol_properties>
+                    <property key="num_of_datacenters" value="3"/>
+                    <property key="num_of_partitions" value="3"/>
+                    <property key="dc_id" value="1"/>
+                    <property key="p_id" value="0"/>
+                </protocol_properties>
+            </config>
+        </server>
+        <server id="1_1" ip="127.0.0.1">
+            <config>
+                <server_jar_file>cops-server.jar</server_jar_file>
+                <username>santos</username>
+                <password>9637452as</password>
+                <working_directory>/home/santos/Desktop/test/server1_1</working_directory>
+                <client_port>10110</client_port>
+                <server_port>10111</server_port>
+                <control_port>10112</control_port>
+                <protocol_properties>
+                    <property key="num_of_datacenters" value="3"/>
+                    <property key="num_of_partitions" value="3"/>
+                    <property key="dc_id" value="1"/>
+                    <property key="p_id" value="1"/>
+                </protocol_properties>
+            </config>
+        </server>
+        <server id="0_2" ip="127.0.0.1">
+            <config>
+                <server_jar_file>cops-server.jar</server_jar_file>
+                <username>santos</username>
+                <password>9637452as</password>
+                <working_directory>/home/santos/Desktop/test/server0_2</working_directory>
+                <client_port>10020</client_port>
+                <server_port>10021</server_port>
+                <control_port>10022</control_port>
+                <protocol_properties>
+                    <property key="num_of_datacenters" value="3"/>
+                    <property key="num_of_partitions" value="3"/>
+                    <property key="dc_id" value="0"/>
+                    <property key="p_id" value="2"/>
+                </protocol_properties>
+            </config>
+        </server>
+        <server id="2_0" ip="127.0.0.1">
+            <config>
+                <server_jar_file>cops-server.jar</server_jar_file>
+                <username>santos</username>
+                <password>9637452as</password>
+                <working_directory>/home/santos/Desktop/test/server2_0</working_directory>
+                <client_port>10200</client_port>
+                <server_port>10201</server_port>
+                <control_port>10202</control_port>
+                <protocol_properties>
+                    <property key="num_of_datacenters" value="3"/>
+                    <property key="num_of_partitions" value="3"/>
+                    <property key="dc_id" value="2"/>
+                    <property key="p_id" value="0"/>
+                </protocol_properties>
+            </config>
+        </server>
+        <server id="1_2" ip="127.0.0.1">
+            <config>
+                <server_jar_file>cops-server.jar</server_jar_file>
+                <username>santos</username>
+                <password>9637452as</password>
+                <working_directory>/home/santos/Desktop/test/server1_2</working_directory>
+                <client_port>10120</client_port>
+                <server_port>10121</server_port>
+                <control_port>10122</control_port>
+                <protocol_properties>
+                    <property key="num_of_datacenters" value="3"/>
+                    <property key="num_of_partitions" value="3"/>
+                    <property key="dc_id" value="1"/>
+                    <property key="p_id" value="2"/>
+                </protocol_properties>
+            </config>
+        </server>
+        <server id="2_1" ip="127.0.0.1">
+            <config>
+                <server_jar_file>cops-server.jar</server_jar_file>
+                <username>santos</username>
+                <password>9637452as</password>
+                <working_directory>/home/santos/Desktop/test/server2_1</working_directory>
+                <client_port>10210</client_port>
+                <server_port>10211</server_port>
+                <control_port>10212</control_port>
+                <protocol_properties>
+                    <property key="num_of_datacenters" value="3"/>
+                    <property key="num_of_partitions" value="3"/>
+                    <property key="dc_id" value="2"/>
+                    <property key="p_id" value="1"/>
+                </protocol_properties>
+            </config>
+        </server>
+        <server id="2_2" ip="127.0.0.1">
+            <config>
+                <server_jar_file>cops-server.jar</server_jar_file>
+                <username>santos</username>
+                <password>9637452as</password>
+                <working_directory>/home/santos/Desktop/test/server2_2</working_directory>
+                <client_port>10220</client_port>
+                <server_port>10221</server_port>
+                <control_port>10222</control_port>
+                <protocol_properties>
+                    <property key="num_of_datacenters" value="3"/>
+                    <property key="num_of_partitions" value="3"/>
+                    <property key="dc_id" value="2"/>
+                    <property key="p_id" value="2"/>
+                </protocol_properties>
+            </config>
+        </server>
+    </servers>
+    <topology>
+        <connect>
+            <id>0_0</id>
+            <id>0_1</id>
+            <id>0_2</id>
+        </connect>
+        <connect>
+            <id>2_0</id>
+            <id>2_1</id>
+            <id>2_2</id>
+        </connect>
+        <connect>
+            <id>1_0</id>
+            <id>1_1</id>
+            <id>1_2</id>
+        </connect>
+        <connect>
+            <id>1_2</id>
+            <id>2_2</id>
+        </connect>
+        <connect>
+            <id>1_1</id>
+            <id>2_1</id>
+        </connect>
+        <connect>
+            <id>0_0</id>
+            <id>1_0</id>
+        </connect>
+        <connect>
+            <id>0_2</id>
+            <id>1_2</id>
+        </connect>
+        <connect>
+            <id>1_0</id>
+            <id>2_0</id>
+        </connect>
+        <connect>
+            <id>0_1</id>
+            <id>1_1</id>
+        </connect>
+    </topology>
+</cluster>

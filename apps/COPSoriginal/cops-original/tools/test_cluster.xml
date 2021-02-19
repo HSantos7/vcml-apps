@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cluster>
+    <name>test_cluster</name>
+    <defaults/>
+    <servers>
+        <server id="0_0" ip="127.0.0.1">
+            <config>
+                <server_jar_file>cops-server.jar</server_jar_file>
+                <username>santos</username>
+                <password>9637452as</password>
+                <working_directory>/home/santos/Desktop/test/force/server0_0</working_directory>
+                <client_port>30000</client_port>
+                <server_port>30001</server_port>
+                <control_port>30002</control_port>
+                <protocol_properties>
+                    <property key="num_of_datacenters" value="2"/>
+                    <property key="num_of_partitions" value="1"/>
+                    <property key="dc_id" value="0"/>
+                    <property key="p_id" value="0"/>
+                </protocol_properties>
+            </config>
+        </server>
+    </servers>
+</cluster>

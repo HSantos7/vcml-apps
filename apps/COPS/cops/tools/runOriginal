@@ -1,0 +1,25 @@
+load_cluster cops_inesc_finalO.xml
+upload_cluster
+start_cluster
+cluster_status
+cluster_status
+cluster_status
+cluster_status
+cluster_status
+cluster_status
+cluster_status
+cluster_status
+cluster_status
+cluster_status
+cluster_status
+cluster_status
+cluster_status
+cluster_status
+cluster_status
+cluster_status
+load_experiment cops_exp_inesc_finalO.xml
+upload_experiment all
+start_experiment 20
+parse_results
+read_agg_results
+exit

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<experiment>
+    <name>cops_exp_inesc_final</name>
+    <defaults/>
+    <clients>
+        <client id="Client_3" ip="10.100.0.196">
+            <config>
+                <os>linux</os>
+                <client_jar_file>cops-client-original.jar</client_jar_file>
+                <client_class_name>edu.msu.cse.cops.client.COPSClient</client_class_name>
+                <workload>properties.txt</workload>
+                <username>vagrant</username>
+                <password>vagrant</password>
+                <working_directory>/home/vagrant/Origclient_3</working_directory>
+                <protocol_properties>
+                    <property key="num_of_partitions" value="3"/>
+                    <property key="dc_id" value="2"/>
+                </protocol_properties>
+            </config>
+            <connect_to>
+                <server id="2_0" ip="10.100.0.159" port="30000"/>
+                <server id="2_1" ip="10.100.0.192" port="30010"/>
+                <server id="2_2" ip="10.100.0.172" port="30020"/>
+            </connect_to>
+        </client>
+        <client id="Client_0" ip="10.100.0.129">
+            <config>
+                <os>linux</os>
+                <client_jar_file>cops-client-original.jar</client_jar_file>
+                <client_class_name>edu.msu.cse.cops.client.COPSClient</client_class_name>
+                <workload>properties.txt</workload>
+                <username>vagrant</username>
+                <password>vagrant</password>
+                <working_directory>/home/vagrant/Origclient_0</working_directory>
+                <protocol_properties>
+                    <property key="num_of_partitions" value="3"/>
+                    <property key="dc_id" value="0"/>
+                </protocol_properties>
+            </config>
+            <connect_to>
+                <server id="0_0" ip="10.100.0.114" port="10000"/>
+                <server id="0_1" ip="10.100.0.128" port="10010"/>
+                <server id="0_2" ip="10.100.0.122" port="10020"/>
+            </connect_to>
+        </client>
+        <client id="Client_1" ip="10.100.0.135">
+            <config>
+                <os>linux</os>
+                <client_jar_file>cops-client-original.jar</client_jar_file>
+                <client_class_name>edu.msu.cse.cops.client.COPSClient</client_class_name>
+                <workload>properties.txt</workload>
+                <username>vagrant</username>
+                <password>vagrant</password>
+                <working_directory>/home/vagrant/Origclient_1</working_directory>
+                <protocol_properties>
+                    <property key="num_of_partitions" value="3"/>
+                    <property key="dc_id" value="0"/>
+                </protocol_properties>
+            </config>
+            <connect_to>
+                <server id="0_0" ip="10.100.0.114" port="10000"/>
+                <server id="0_1" ip="10.100.0.128" port="10010"/>
+                <server id="0_2" ip="10.100.0.122" port="10020"/>
+            </connect_to>
+        </client>
+        <client id="Client_2" ip="10.100.0.102">
+            <config>
+                <os>linux</os>
+                <client_jar_file>cops-client-original.jar</client_jar_file>
+                <client_class_name>edu.msu.cse.cops.client.COPSClient</client_class_name>
+                <workload>properties.txt</workload>
+                <username>vagrant</username>
+                <password>vagrant</password>
+                <working_directory>/home/vagrant/Origclient_2</working_directory>
+                <protocol_properties>
+                    <property key="num_of_partitions" value="3"/>
+                    <property key="dc_id" value="0"/>
+                </protocol_properties>
+            </config>
+            <connect_to>
+                <server id="0_0" ip="10.100.0.114" port="10000"/>
+                <server id="0_1" ip="10.100.0.128" port="10010"/>
+                <server id="0_2" ip="10.100.0.122" port="10020"/>
+            </connect_to>
+        </client>
+        <client id="Client_4" ip="10.100.0.148">
+            <config>
+                <os>linux</os>
+                <client_jar_file>cops-client-original.jar</client_jar_file>
+                <client_class_name>edu.msu.cse.cops.client.COPSClient</client_class_name>
+                <workload>properties.txt</workload>
+                <username>vagrant</username>
+                <password>vagrant</password>
+                <working_directory>/home/vagrant/Origclient_4</working_directory>
+                <protocol_properties>
+                    <property key="num_of_partitions" value="3"/>
+                    <property key="dc_id" value="2"/>
+                </protocol_properties>
+            </config>
+            <connect_to>
+                <server id="2_0" ip="10.100.0.159" port="30000"/>
+                <server id="2_1" ip="10.100.0.192" port="30010"/>
+                <server id="2_2" ip="10.100.0.172" port="30020"/>
+            </connect_to>
+        </client>
+        <client id="Client_5" ip="10.100.0.162">
+            <config>
+                <os>linux</os>
+                <client_jar_file>cops-client-original.jar</client_jar_file>
+                <client_class_name>edu.msu.cse.cops.client.COPSClient</client_class_name>
+                <workload>properties.txt</workload>
+                <username>vagrant</username>
+                <password>vagrant</password>
+                <working_directory>/home/vagrant/Origclient_5</working_directory>
+                <protocol_properties>
+                    <property key="num_of_partitions" value="3"/>
+                    <property key="dc_id" value="2"/>
+                </protocol_properties>
+            </config>
+            <connect_to>
+                <server id="2_0" ip="10.100.0.159" port="30000"/>
+                <server id="2_1" ip="10.100.0.192" port="30010"/>
+                <server id="2_2" ip="10.100.0.172" port="30020"/>
+            </connect_to>
+        </client>
+    </clients>
+    <workload_variations/>
+</experiment>

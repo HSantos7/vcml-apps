@@ -1,0 +1,81 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+machines = [
+    {
+        :name => "server",
+        :eth1 => "192.168.205.10",
+        :mem => "1024",
+        :cpu => "1",
+        :port => "10000",
+        :port2 => "10001",
+        :port3 => "10002"
+    }#,
+#    {
+#        :name => "server-1-0",
+#        :eth1 => "192.168.205.11",
+#        :mem => "1024",
+#        :cpu => "1",
+#        :port => "30002"
+#    },
+#    {
+#        :name => "client-0",
+#        :eth1 => "192.168.205.12",
+#        :mem => "1024",
+#        :cpu => "1",
+#        :port => "30003"
+#    },
+#    {
+#        :name => "client-1",
+#        :eth1 => "192.168.205.13",
+#        :mem => "1024",
+#        :cpu => "1",
+#        :port => "30004"
+#    }
+]
+
+Vagrant.configure("2") do |config|
+  #config.vm.box = "hashicorp/bionic64"
+  config.vm.box = "ubuntu/focal64"
+  config.vm.provision :shell, path: "bootstrap.sh"
+  config.vm.boot_timeout = 600
+  config.ssh.username = 'vagrant'
+  #config.ssh.password = "12345"
+  config.ssh.insert_key = false
+
+  config.vm.network "public_network"
+
+  machines.each do |opts|
+    config.vm.define opts[:name] do |subconfig|
+      #subconfig.vm.hostname = opts[:name]
+
+      subconfig.vm.provider "virtualbox" do |v|
+        v.customize ["modifyvm", :id, "--memory", opts[:mem]]
+        v.customize ["modifyvm", :id, "--cpus", opts[:cpu]]
+      end
+
+      #subconfig.vm.network "forwarded_port", guest: opts[:port], host: opts[:port]
+      #subconfig.vm.network "forwarded_port", guest: opts[:port2], host: opts[:port2]
+      #subconfig.vm.network "forwarded_port", guest: opts[:port3], host: opts[:port3]
+
+      #subconfig.vm.network :private_network, ip: opts[:eth1]
+    end
+    #subconfig.vm.network "public_network" 
+  end
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network "public_network"
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  # config.vm.synced_folder "../data", "/vagrant_data"
+
+end

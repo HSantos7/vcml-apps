@@ -1,0 +1,39 @@
+- Necessário criar jar: cops-server e cops-client
+- Mover jar para tools/
+- Abrir ClusterDesigner.jar
+    - Add N Server
+        - ip
+        - server_java_file
+        - username (sshserver)
+        - password (sshserver)
+        - client_port
+        - server_port
+        - control_port
+        - working_directory
+        Set protocol_properties:
+            - num_of_datacenters
+            - num_of_partitions
+            - dc_id
+            - p_id
+    - Export cluster
+    - Add N clients
+        - ip
+        - client_java_file
+        - client_class_name
+        - username (sshserver)
+        - password (sshserver)
+        - workload (properties file)
+        - working_directory
+        - os
+        Set protocol_properties:
+            - num_of_partitions
+            - dc_id
+    - Export experiment
+- Abrir ClusterManager.jar
+    - load_cluster cluster.xml
+    - upload_cluster
+    - start_cluster
+    - load_experiment experiment.xml
+    - upload_experiment all
+    - start_experiment 20
+

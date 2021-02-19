@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<experiment>
+    <name>cops_exp_inesc</name>
+    <defaults/>
+    <clients>
+        <client id="Client_1" ip="10.100.0.126">
+            <config>
+                <os>linux</os>
+                <client_jar_file>cops-client.jar</client_jar_file>
+                <client_class_name>edu.msu.cse.cops.client.COPSClient</client_class_name>
+                <workload>properties.txt</workload>
+                <username>vagrant</username>
+                <password>vagrant</password>
+                <working_directory>/home/vagrant/client_1</working_directory>
+                <protocol_properties>
+                    <property key="num_of_partitions" value="1"/>
+                    <property key="dc_id" value="1"/>
+                </protocol_properties>
+            </config>
+            <connect_to>
+                <server id="1_0" ip="10.100.0.175" port="20000"/>
+            </connect_to>
+        </client>
+        <client id="Client_0" ip="10.100.0.188">
+            <config>
+                <os>linux</os>
+                <client_jar_file>cops-client.jar</client_jar_file>
+                <client_class_name>edu.msu.cse.cops.client.COPSClient</client_class_name>
+                <workload>properties.txt</workload>
+                <username>vagrant</username>
+                <password>vagrant</password>
+                <working_directory>/home/vagrant/client_0</working_directory>
+                <protocol_properties>
+                    <property key="num_of_partitions" value="1"/>
+                    <property key="dc_id" value="0"/>
+                </protocol_properties>
+            </config>
+            <connect_to>
+                <server id="0_0" ip="10.100.0.162" port="10000"/>
+            </connect_to>
+        </client>
+    </clients>
+    <workload_variations/>
+</experiment>

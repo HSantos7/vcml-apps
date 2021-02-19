@@ -1,0 +1,403 @@
+/*
+ * Copyright 2008-2009 LinkedIn, Inc
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
+package voldemort.client;
+
+import com.google.common.collect.Maps;
+import org.apache.log4j.Logger;
+import voldemort.VoldemortException;
+import voldemort.annotations.concurrency.Threadsafe;
+import voldemort.annotations.jmx.JmxManaged;
+import voldemort.annotations.jmx.JmxOperation;
+import voldemort.consistency.cluster.Node;
+import voldemort.consistency.Constants;
+import voldemort.consistency.Framework;
+import voldemort.consistency.types.Content;
+import voldemort.consistency.types.Message;
+import voldemort.consistency.types.MetaData;
+import voldemort.consistency.utils.serialization.Serializer;
+import voldemort.consistency.versioning.*;
+import voldemort.routing.RoutingStrategy;
+import voldemort.store.InvalidMetadataException;
+import voldemort.store.Store;
+import voldemort.store.StoreCapabilityType;
+import voldemort.utils.JmxUtils;
+import voldemort.utils.Utils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.Callable;
+
+/**
+ * The default {@link voldemort.client.StoreClient StoreClient} implementation
+ * you get back from a {@link voldemort.client.StoreClientFactory
+ * StoreClientFactory}
+ * 
+ * 
+ * @param <K> The key type
+ * @param <V> The value type
+ */
+@Threadsafe
+@JmxManaged(description = "A voldemort client")
+public class DefaultStoreClient<K, V> implements StoreClient<K, V> {
+
+    private final Logger logger = Logger.getLogger(DefaultStoreClient.class);
+    protected Callable<Object> beforeRebootstrapCallback = null;
+    protected StoreClientFactory storeFactory;
+    protected int metadataRefreshAttempts;
+    public Framework<K,V> framework = null;
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    protected String storeName;
+    protected InconsistencyResolver<Versioned<V>> resolver;
+
+    protected volatile Store<K, V, Object> store;
+
+    public DefaultStoreClient(String storeName,
+                              InconsistencyResolver<Versioned<V>> resolver,
+                              StoreClientFactory storeFactory,
+                              int maxMetadataRefreshAttempts) {
+        this.storeName = Utils.notNull(storeName);
+        this.resolver = resolver;
+        this.storeFactory = Utils.notNull(storeFactory);
+        this.metadataRefreshAttempts = maxMetadataRefreshAttempts;
+
+        // Registering self to be able to bootstrap client dynamically via JMX
+        JmxUtils.registerMbean(this,
+                               JmxUtils.createObjectName(JmxUtils.getPackageName(this.getClass()),
+                                                         JmxUtils.getClassName(this.getClass())
+                                                                 + "." + storeName));
+
+        bootStrap();
+    }
+
+    // Default constructor invoked from child class
+    public DefaultStoreClient() {}
+
+    @JmxOperation(description = "bootstrap metadata from the cluster.")
+    public void bootStrap() {
+        if(beforeRebootstrapCallback != null) {
+            try {
+                beforeRebootstrapCallback.call();
+            } catch(Exception e) {
+                logger.warn("Exception caught when running callback before bootstrap", e);
+            }
+        }
+        logger.info("Bootstrapping metadata for store " + this.storeName);
+        this.store = storeFactory.getRawStore(storeName, resolver);
+    }
+
+    public boolean delete(K key) {
+        if(framework == null)
+            framework = new Framework<>();
+        Content<K, V> content = new Content<>(key);
+        MetaData metaData = new MetaData();
+        framework.newMessage(new Message<K, V>(Message.Type.DELETE, content, metaData));
+        return metaData != null;
+    }
+
+    public boolean delete(K key, Version version) {
+        for(int attempts = 0; attempts < this.metadataRefreshAttempts; attempts++) {
+            try {
+                return store.delete(key, version);
+            } catch(InvalidMetadataException e) {
+                logger.info("Received invalid metadata exception during delete [  "
+                            + e.getMessage() + " ] on store '" + storeName + "'. Rebootstrapping");
+                bootStrap();
+            }
+        }
+        throw new VoldemortException(this.metadataRefreshAttempts
+                                     + " metadata refresh attempts failed.");
+    }
+
+    public V getValue(K key, V defaultValue) {
+        Versioned<V> versioned = get(key);
+        if(versioned == null)
+            return defaultValue;
+        else
+            return versioned.getValue();
+    }
+
+    public V getValue(K key) {
+        Versioned<V> returned = get(key, null);
+        if(returned == null)
+            return null;
+        else
+            return returned.getValue();
+    }
+
+    public Versioned<V> get(K key, Versioned<V> defaultValue) {
+        for(int attempts = 0; attempts < this.metadataRefreshAttempts; attempts++) {
+            try {
+                List<Versioned<V>> items = store.get(key, null);
+                return getItemOrThrow(key, defaultValue, items);
+            } catch(InvalidMetadataException e) {
+                logger.info("Received invalid metadata exception during get [  " + e.getMessage()
+                            + " ] on store '" + storeName + "'. Rebootstrapping");
+                bootStrap();
+            }
+        }
+        throw new VoldemortException(this.metadataRefreshAttempts
+                                     + " metadata refresh attempts failed.");
+    }
+
+    @Override
+    public Version newMessage(K key, V value) {
+        Version version = getVersionForPut(key);
+        Versioned<V> versioned = Versioned.value(value, version);
+        return put(key, versioned);
+    }
+
+    public Versioned<V> get(K key, Versioned<V> defaultValue, Object transform) {
+        for(int attempts = 0; attempts < this.metadataRefreshAttempts; attempts++) {
+            try {
+                List<Versioned<V>> items = store.get(key, transform);
+                return getItemOrThrow(key, defaultValue, items);
+            } catch(InvalidMetadataException e) {
+                logger.info("Received invalid metadata exception during get [  " + e.getMessage()
+                            + " ] on store '" + storeName + "'. Rebootstrapping");
+                bootStrap();
+            }
+        }
+        throw new VoldemortException(this.metadataRefreshAttempts
+                                     + " metadata refresh attempts failed.");
+    }
+
+    protected List<Version> getVersions(K key) {
+        for(int attempts = 0; attempts < this.metadataRefreshAttempts; attempts++) {
+            try {
+                return store.getVersions(key);
+            } catch(InvalidMetadataException e) {
+                logger.info("Received invalid metadata exception during getVersions [  "
+                            + e.getMessage() + " ] on store '" + storeName + "'. Rebootstrapping");
+                bootStrap();
+            }
+        }
+        throw new VoldemortException(this.metadataRefreshAttempts
+                                     + " metadata refresh attempts failed.");
+    }
+
+    protected Versioned<V> getItemOrThrow(K key, Versioned<V> defaultValue, List<Versioned<V>> items) {
+        if(items.size() == 0)
+            return defaultValue;
+        else if(items.size() == 1)
+            return items.get(0);
+        else
+            throw new InconsistentDataException("Unresolved versions returned from get(" + key
+                                                + ") = " + items, items);
+    }
+
+    public Versioned<V> get(K key) {
+        if(framework == null)
+            framework = new Framework<>();
+        Content<K, V> content = new Content<K,V>(key);
+        MetaData metaData = new MetaData();
+        framework.newMessage(new Message<K, V>(Message.Type.GET, content, metaData));
+        return (Versioned<V>) metaData.getVersioned();
+        //return get(key, null);
+    }
+
+    public Map<K, Versioned<V>> getAll(Iterable<K> keys) {
+        Map<K, List<Versioned<V>>> items = null;
+        for(int attempts = 0;; attempts++) {
+            if(attempts >= this.metadataRefreshAttempts)
+                throw new VoldemortException(this.metadataRefreshAttempts
+                                             + " metadata refresh attempts failed.");
+            try {
+                items = store.getAll(keys, null);
+                break;
+            } catch(InvalidMetadataException e) {
+                logger.info("Received invalid metadata exception during getAll [  "
+                            + e.getMessage() + " ] on store '" + storeName + "'. Rebootstrapping");
+                bootStrap();
+            }
+        }
+        Map<K, Versioned<V>> result = Maps.newHashMapWithExpectedSize(items.size());
+
+        for(Entry<K, List<Versioned<V>>> mapEntry: items.entrySet()) {
+            Versioned<V> value = getItemOrThrow(mapEntry.getKey(), null, mapEntry.getValue());
+            result.put(mapEntry.getKey(), value);
+        }
+        return result;
+    }
+
+    public Version put(K key, V value) {
+        if(framework == null)
+            framework = new Framework<>();
+        Content<K, V> content = new Content<K,V>(key, value);
+        MetaData metaData = new MetaData();
+        framework.newMessage(new Message<K, V>(Message.Type.PUT, content, metaData));
+        return metaData.getVersion();
+    }
+
+    public Version put(K key, Versioned<V> versioned, Object transform)
+            throws ObsoleteVersionException {
+        for(int attempts = 0; attempts < this.metadataRefreshAttempts; attempts++) {
+            try {
+                store.put(key, versioned, transform);
+                return versioned.getVersion();
+            } catch(InvalidMetadataException e) {
+                logger.info("Received invalid metadata exception during put [  " + e.getMessage()
+                            + " ] on store '" + storeName + "'. Rebootstrapping");
+                bootStrap();
+            }
+        }
+        throw new VoldemortException(this.metadataRefreshAttempts
+                                     + " metadata refresh attempts failed.");
+    }
+
+    public boolean putIfNotObsolete(K key, Versioned<V> versioned) {
+        try {
+            put(key, versioned);
+            return true;
+        } catch(ObsoleteVersionException e) {
+            return false;
+        }
+    }
+
+    public Version put(K key, Versioned<V> versioned) throws ObsoleteVersionException {
+
+        for(int attempts = 0; attempts < this.metadataRefreshAttempts; attempts++) {
+            try {
+                store.put(key, versioned, null);
+                return versioned.getVersion();
+            } catch(InvalidMetadataException e) {
+                logger.info("Received invalid metadata exception during put [  " + e.getMessage()
+                            + " ] on store '" + storeName + "'. Rebootstrapping");
+                bootStrap();
+            }
+        }
+        throw new VoldemortException(this.metadataRefreshAttempts
+                                     + " metadata refresh attempts failed.");
+    }
+
+    public boolean applyUpdate(UpdateAction<K, V> action) {
+        return applyUpdate(action, 3);
+    }
+
+    public boolean applyUpdate(UpdateAction<K, V> action, int maxTries) {
+        boolean success = false;
+        try {
+            for(int i = 0; i < maxTries; i++) {
+                try {
+                    action.update(this);
+                    success = true;
+                    return success;
+                } catch(ObsoleteVersionException e) {
+                    // ignore for now
+                }
+            }
+        } finally {
+            if(!success)
+                action.rollback();
+        }
+
+        // if we got here we have seen too many ObsoleteVersionExceptions
+        // and have rolled back the updates
+        return false;
+    }
+
+    public List<Node> getResponsibleNodes(K key) {
+        RoutingStrategy strategy = (RoutingStrategy) store.getCapability(StoreCapabilityType.ROUTING_STRATEGY);
+        @SuppressWarnings("unchecked")
+        Serializer<K> keySerializer = (Serializer<K>) store.getCapability(StoreCapabilityType.KEY_SERIALIZER);
+        return strategy.routeRequest(keySerializer.toBytes(key));
+    }
+
+    @SuppressWarnings("unused")
+    protected Version getVersion(K key) {
+        List<Version> versions = getVersions(key);
+        if(versions.size() == 0)
+            return null;
+        else if(versions.size() == 1)
+            return versions.get(0);
+        else
+            throw new InconsistentDataException("Unresolved versions returned from get(" + key
+                                                + ") = " + versions, versions);
+    }
+
+    public Versioned<V> get(K key, Object transforms) {
+        return get(key, null, transforms);
+    }
+
+    public Map<K, Versioned<V>> getAll(Iterable<K> keys, Map<K, Object> transforms) {
+        Map<K, List<Versioned<V>>> items = null;
+        for(int attempts = 0;; attempts++) {
+            if(attempts >= this.metadataRefreshAttempts)
+                throw new VoldemortException(this.metadataRefreshAttempts
+                                             + " metadata refresh attempts failed.");
+            try {
+                items = store.getAll(keys, transforms);
+                break;
+            } catch(InvalidMetadataException e) {
+                logger.info("Received invalid metadata exception during getAll [  "
+                            + e.getMessage() + " ] on store '" + storeName + "'. Rebootstrapping");
+                bootStrap();
+            }
+        }
+        Map<K, Versioned<V>> result = Maps.newHashMapWithExpectedSize(items.size());
+
+        for(Entry<K, List<Versioned<V>>> mapEntry: items.entrySet()) {
+            Versioned<V> value = getItemOrThrow(mapEntry.getKey(), null, mapEntry.getValue());
+            result.put(mapEntry.getKey(), value);
+        }
+        return result;
+    }
+
+    private Version getVersionWithResolution(K key) {
+        List<Version> versions = getVersions(key);
+        if(versions.isEmpty())
+            return null;
+        else if(versions.size() == 1)
+            return versions.get(0);
+        else {
+            Versioned<V> versioned = get(key, null);
+            if(versioned == null)
+                return null;
+            else
+                return versioned.getVersion();
+        }
+    }
+
+    public Version getVersionForPut(K key) {
+        Version version = getVersionWithResolution(key);
+        if(version == null) {
+            try {
+                version = (Version) Constants.getVersionType().newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return version;
+    }
+
+    public Version put(K key, V value, Object transforms) {
+        Version version = getVersionForPut(key);
+        Versioned<V> versioned = Versioned.value(value, version);
+        return put(key, versioned, transforms);
+
+    }
+
+    public void setBeforeRebootstrapCallback(Callable<Object> callback) {
+        beforeRebootstrapCallback = callback;
+    }
+}
