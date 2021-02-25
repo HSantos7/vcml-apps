@@ -1,6 +1,0 @@
-RedBlue_consistency/src/applications/Quoddy filter=lfs diff=lfs merge=lfs -text
-RedBlue_consistency/src/applications/RUBiStxmud filter=lfs diff=lfs merge=lfs -text
-RedBlue_consistency/src/applications/microbenchmark filter=lfs diff=lfs merge=lfs -text
-RedBlue_consistency/src/applications/simplestub filter=lfs diff=lfs merge=lfs -text
-RedBlue_consistency/src/applications/tpc-w-fenix filter=lfs diff=lfs merge=lfs -text
-RedBlue_consistency/src/applications/versionzero filter=lfs diff=lfs merge=lfs -text
